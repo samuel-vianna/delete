@@ -1,0 +1,285 @@
+{
+  "connectorId": "668413cc7f0d7012e35c2c0c",
+  "name": "sql-connector",
+  "connectors": [
+    {
+      "_id": {
+        "$oid": "668413cc7f0d7012e35c2c0c"
+      },
+      "name": "sql-connector",
+      "description": "Configures SQL Server connection for integration with QSCIM, formatting data and defining mappings for exchanging information between systems.",
+      "connector": "sqlserver",
+      "port": 80,
+      "auth": [
+        {
+          "name": "Basic Auth",
+          "description": "Basic Auth simplifies user authentication, guaranteeing secure access via username and password credentials.",
+          "type": "basic",
+          "details": {
+            "username": "process.env.USERNAME",
+            "password": "process.env.PASSWORD"
+          }
+        }
+      ],
+      "config": {
+        "description": "",
+        "host": "172.17.0.1",
+        "port": 1433,
+        "database": "master",
+        "schema": "dbo",
+        "username": "SA",
+        "password": "Scim#123_456",
+        "userTableName": "Usuario",
+        "groupTableName": "Grupo",
+        "relationshipTableName": "RelUsuarioGrupo"
+      },
+      "mapping": {
+        "description": "",
+        "user": [
+          {
+            "name": "id",
+            "mapTo": "id",
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "mapTo": "userName",
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "mapTo": "active",
+            "type": "boolean"
+          },
+          {
+            "name": "password",
+            "mapTo": "password",
+            "type": "string"
+          },
+          {
+            "name": "givenName",
+            "mapTo": "name.givenName",
+            "type": "string"
+          },
+          {
+            "name": "familyName",
+            "mapTo": "name.familyName",
+            "type": "string"
+          },
+          {
+            "name": "displayName",
+            "mapTo": "name.formatted",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "mapTo": "emails.work.value",
+            "type": "string"
+          },
+          {
+            "name": "homePhone",
+            "mapTo": "phoneNumbers.home.value",
+            "type": "string"
+          },
+          {
+            "name": "postalCode",
+            "mapTo": "addresses.work.postalCode",
+            "type": "string"
+          },
+          {
+            "name": "streetAddress",
+            "mapTo": "addresses.work.streetAddress",
+            "type": "string"
+          },
+          {
+            "name": "telephoneNumber",
+            "mapTo": "phoneNumbers.work.value",
+            "type": "string"
+          }
+        ],
+        "group": [
+          {
+            "name": "id",
+            "mapTo": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "mapTo": "displayName",
+            "type": "string"
+          }
+        ],
+        "relationship": {
+          "users": "user_id",
+          "groups": "group_id"
+        }
+      },
+      "workspaceId": "6684136c7f0d7012e35c2c02",
+      "interceptors": [],
+      "adapters": [
+        {
+          "name": "Cache",
+          "description": "Cache data to store information and improve the efficiency of the application",
+          "type": "cache",
+          "details": {
+            "name": "token",
+            "url": "process.env.CACHE_TOKEN_URL",
+            "method": "POST",
+            "expires_in": "1440",
+            "headers": "{client_id: process.env.CLIENT_ID}",
+            "body": "{grant_type: \"client_credentials\"}",
+            "mapping": [
+              {
+                "name": "access_token",
+                "mapTo": "token"
+              }
+            ],
+            "auth": [
+              {
+                "name": "type",
+                "value": "basic"
+              },
+              {
+                "name": "username",
+                "label": "Username",
+                "icon": "user",
+                "value": "process.env.CLIENT_ID"
+              },
+              {
+                "name": "password",
+                "label": "Password",
+                "icon": "lock",
+                "isHidden": false,
+                "value": "process.env.CLIENT_SECRET"
+              }
+            ]
+          }
+        },
+        {
+          "name": "HTTP Notification",
+          "description": "Send a notification using HTTP Request to notify an event to a third party application.",
+          "type": "notification",
+          "details": {
+            "url": "process.env.NOTIFICATION_URL",
+            "method": "PATCH",
+            "type": "onSuccess",
+            "payload": "request",
+            "use_url": true,
+            "allowed_requests": [
+              {
+                "path": "groups",
+                "method": "POST"
+              }
+            ],
+            "auth": [
+              {
+                "name": "type",
+                "value": "bearer"
+              },
+              {
+                "name": "token",
+                "label": "Token",
+                "icon": "lock",
+                "isHidden": false,
+                "value": "{{cache.token.token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "HTTP Notification",
+          "description": "Send a notification using HTTP Request to notify an event to a third party application.",
+          "type": "notification",
+          "details": {
+            "url": "process.env.NOTIFICATION_URL",
+            "method": "POST",
+            "type": "onSuccess",
+            "payload": "response",
+            "use_url": true,
+            "allowed_requests": [
+              {
+                "path": "users",
+                "method": "POST"
+              }
+            ],
+            "auth": [
+              {
+                "name": "type",
+                "value": "bearer"
+              },
+              {
+                "name": "token",
+                "label": "Token",
+                "icon": "lock",
+                "isHidden": false,
+                "value": "{{cache.token.token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "HTTP Notification",
+          "description": "Send a notification using HTTP Request to notify an event to a third party application.",
+          "type": "notification",
+          "details": {
+            "url": "process.env.NOTIFICATION_URL",
+            "method": "POST",
+            "type": "onSuccess",
+            "payload": "request",
+            "use_url": true,
+            "allowed_requests": [
+              {
+                "path": "users",
+                "method": "PATCH"
+              }
+            ],
+            "auth": [
+              {
+                "name": "type",
+                "value": "bearer"
+              },
+              {
+                "name": "token",
+                "label": "Token",
+                "icon": "lock",
+                "isHidden": false,
+                "value": "{{cache.token.token}}"
+              }
+            ]
+          }
+        }
+      ],
+      "listeners": [],
+      "positions": {
+        "adapters": {
+          "x": 450,
+          "y": 100
+        },
+        "interceptors": {
+          "x": 450,
+          "y": 1680
+        },
+        "listeners": {
+          "x": 450,
+          "y": 0
+        },
+        "config": {
+          "x": 450,
+          "y": 2000
+        },
+        "mapping": {
+          "x": 450,
+          "y": 2460
+        },
+        "authentication": {
+          "x": 450,
+          "y": 1780
+        }
+      },
+      "_etag": {
+        "$oid": "6684179b7f0d7012e35c2c25"
+      }
+    }
+  ],
+  "generatedAt": "2024-07-05T18:30:59.417Z"
+}

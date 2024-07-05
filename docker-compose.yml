@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  scimgateway:
+    build: ./scimgateway
+    ports:
+      - "80:80"
+    restart: always
+    environment:
+      sqlserver-sql-connector_BASIC_0_USERNAME: process.env.USERNAME
+      sqlserver-sql-connector_BASIC_0_PASSWORD: process.env.PASSWORD
+
+      DATABASE_URL: sqlserver://172.17.0.1:1433;database=master;schema=dbo;user=SA;password=Scim#123_456;encrypt=true;trustServerCertificate=true
+    volumes:
+      - data:/home/node/app/data
+   
+  
+  
+     
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./data

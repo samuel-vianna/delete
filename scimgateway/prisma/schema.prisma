@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+  // learn more about it in the docs: https://pris.ly/d/prisma-schema
+  
+  generator client {
+    provider = "prisma-client-js"
+  }
+  
+  datasource db {
+    provider = "sqlserver"
+    url      = env("DATABASE_URL")
+  }
+  
+  
+  model Usuario {
+    id String @id @default(uuid())
+    username String @unique
+    active Boolean @default(false)
+    password String?
+    givenName String?
+    familyName String?
+    displayName String?
+    email String?
+    homePhone String?
+    postalCode String?
+    streetAddress String?
+    telephoneNumber String?
+    groups RelUsuarioGrupo[]
+  }
+  
+  model Grupo {
+    id String @id @default(uuid())
+    name String?
+    users RelUsuarioGrupo[]
+  }
+
+  model RelUsuarioGrupo {
+        ref_user_id Usuario @relation(fields: [user_id], references: [id])
+        user_id String
+    ref_group_id Grupo @relation(fields: [group_id], references: [id])
+        group_id String
+    
+        @@id([user_id,group_id])
+      }
+  
+  
